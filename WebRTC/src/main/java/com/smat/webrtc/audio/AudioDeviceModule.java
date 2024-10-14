@@ -1,11 +1,11 @@
 package com.smat.webrtc.audio;
-/* loaded from: input.aar:classes.jar:org/webrtc/audio/AudioDeviceModule.class */
+
 public interface AudioDeviceModule {
-    long getNativeAudioDeviceModulePointer();
+   long getNativeAudioDeviceModulePointer();
 
-    void release();
+   void release();
 
-    void setSpeakerMute(boolean z);
+   void setSpeakerMute(boolean var1);
 
-    void setMicrophoneMute(boolean z);
+   void setMicrophoneMute(boolean var1);
 }

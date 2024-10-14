@@ -1,39 +1,34 @@
 package com.smat.webrtc;
 
 import android.media.MediaCodecInfo;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import java.util.Arrays;
-import org.webrtc.EglBase;
-/* loaded from: input.aar:classes.jar:org/webrtc/PlatformSoftwareVideoDecoderFactory.class */
+
 public class PlatformSoftwareVideoDecoderFactory extends MediaCodecVideoDecoderFactory {
-    private static final Predicate<MediaCodecInfo> defaultAllowedPredicate = new Predicate<MediaCodecInfo>() { // from class: org.webrtc.PlatformSoftwareVideoDecoderFactory.1
-        private String[] prefixWhitelist = (String[]) Arrays.copyOf(MediaCodecUtils.SOFTWARE_IMPLEMENTATION_PREFIXES, MediaCodecUtils.SOFTWARE_IMPLEMENTATION_PREFIXES.length);
+   private static final Predicate<MediaCodecInfo> defaultAllowedPredicate = new Predicate<MediaCodecInfo>() {
+      private String[] prefixWhitelist;
 
-        @Override // org.webrtc.Predicate
-        public boolean test(MediaCodecInfo arg) {
-            String[] strArr;
-            String name = arg.getName();
-            for (String prefix : this.prefixWhitelist) {
-                if (name.startsWith(prefix)) {
-                    return true;
-                }
+      {
+         this.prefixWhitelist = (String[])Arrays.copyOf(MediaCodecUtils.SOFTWARE_IMPLEMENTATION_PREFIXES, MediaCodecUtils.SOFTWARE_IMPLEMENTATION_PREFIXES.length);
+      }
+
+      public boolean test(MediaCodecInfo arg) {
+         String name = arg.getName();
+         String[] var3 = this.prefixWhitelist;
+         int var4 = var3.length;
+
+         for(int var5 = 0; var5 < var4; ++var5) {
+            String prefix = var3[var5];
+            if (name.startsWith(prefix)) {
+               return true;
             }
-            return false;
-        }
-    };
+         }
 
-    @Override // org.webrtc.MediaCodecVideoDecoderFactory, org.webrtc.VideoDecoderFactory
-    public /* bridge */ /* synthetic */ VideoCodecInfo[] getSupportedCodecs() {
-        return super.getSupportedCodecs();
-    }
+         return false;
+      }
+   };
 
-    @Override // org.webrtc.MediaCodecVideoDecoderFactory, org.webrtc.VideoDecoderFactory
-    @Nullable
-    public /* bridge */ /* synthetic */ VideoDecoder createDecoder(VideoCodecInfo videoCodecInfo) {
-        return super.createDecoder(videoCodecInfo);
-    }
-
-    public PlatformSoftwareVideoDecoderFactory(@Nullable EglBase.Context sharedContext) {
-        super(sharedContext, defaultAllowedPredicate);
-    }
+   public PlatformSoftwareVideoDecoderFactory(@Nullable EglBase.Context sharedContext) {
+      super(sharedContext, defaultAllowedPredicate);
+   }
 }

@@ -1,54 +1,50 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/VideoDecoder.class */
+
 public interface VideoDecoder {
+   @CalledByNative
+   default long createNativeVideoDecoder() {
+      return 0L;
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoDecoder$Callback.class */
-    public interface Callback {
-        void onDecodedFrame(VideoFrame videoFrame, Integer num, Integer num2);
-    }
+   @CalledByNative
+   VideoCodecStatus initDecode(Settings var1, Callback var2);
 
-    @CalledByNative
-    VideoCodecStatus initDecode(Settings settings, Callback callback);
+   @CalledByNative
+   VideoCodecStatus release();
 
-    @CalledByNative
-    VideoCodecStatus release();
+   @CalledByNative
+   VideoCodecStatus decode(EncodedImage var1, DecodeInfo var2);
 
-    @CalledByNative
-    VideoCodecStatus decode(EncodedImage encodedImage, DecodeInfo decodeInfo);
+   @CalledByNative
+   boolean getPrefersLateDecoding();
 
-    @CalledByNative
-    boolean getPrefersLateDecoding();
+   @CalledByNative
+   String getImplementationName();
 
-    @CalledByNative
-    String getImplementationName();
+   public interface Callback {
+      void onDecodedFrame(VideoFrame var1, Integer var2, Integer var3);
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoDecoder$Settings.class */
-    public static class Settings {
-        public final int numberOfCores;
-        public final int width;
-        public final int height;
+   public static class DecodeInfo {
+      public final boolean isMissingFrames;
+      public final long renderTimeMs;
 
-        @CalledByNative("Settings")
-        public Settings(int numberOfCores, int width, int height) {
-            this.numberOfCores = numberOfCores;
-            this.width = width;
-            this.height = height;
-        }
-    }
+      public DecodeInfo(boolean isMissingFrames, long renderTimeMs) {
+         this.isMissingFrames = isMissingFrames;
+         this.renderTimeMs = renderTimeMs;
+      }
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoDecoder$DecodeInfo.class */
-    public static class DecodeInfo {
-        public final boolean isMissingFrames;
-        public final long renderTimeMs;
+   public static class Settings {
+      public final int numberOfCores;
+      public final int width;
+      public final int height;
 
-        public DecodeInfo(boolean isMissingFrames, long renderTimeMs) {
-            this.isMissingFrames = isMissingFrames;
-            this.renderTimeMs = renderTimeMs;
-        }
-    }
-
-    @CalledByNative
-    default long createNativeVideoDecoder() {
-        return 0L;
-    }
+      @CalledByNative("Settings")
+      public Settings(int numberOfCores, int width, int height) {
+         this.numberOfCores = numberOfCores;
+         this.width = width;
+         this.height = height;
+      }
+   }
 }

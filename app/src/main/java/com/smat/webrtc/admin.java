@@ -1,4 +1,3 @@
 package com.smat.webrtc;
-
-class Empty {
+public class admin {
 }

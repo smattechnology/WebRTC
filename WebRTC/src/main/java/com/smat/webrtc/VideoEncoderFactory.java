@@ -1,17 +1,17 @@
 package com.smat.webrtc;
 
-import android.support.annotation.Nullable;
-/* loaded from: input.aar:classes.jar:org/webrtc/VideoEncoderFactory.class */
+import androidx.annotation.Nullable;
+
 public interface VideoEncoderFactory {
-    @CalledByNative
-    @Nullable
-    VideoEncoder createEncoder(VideoCodecInfo videoCodecInfo);
+   @Nullable
+   @CalledByNative
+   VideoEncoder createEncoder(VideoCodecInfo var1);
 
-    @CalledByNative
-    VideoCodecInfo[] getSupportedCodecs();
+   @CalledByNative
+   VideoCodecInfo[] getSupportedCodecs();
 
-    @CalledByNative
-    default VideoCodecInfo[] getImplementations() {
-        return getSupportedCodecs();
-    }
+   @CalledByNative
+   default VideoCodecInfo[] getImplementations() {
+      return this.getSupportedCodecs();
+   }
 }

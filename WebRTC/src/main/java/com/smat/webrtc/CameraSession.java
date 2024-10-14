@@ -3,63 +3,57 @@ package com.smat.webrtc;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.view.WindowManager;
-import org.webrtc.VideoFrame;
-import org.webrtc.audio.WebRtcAudioRecord;
-/* JADX INFO: Access modifiers changed from: package-private */
-/* loaded from: input.aar:classes.jar:org/webrtc/CameraSession.class */
-public interface CameraSession {
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/CameraSession$CreateSessionCallback.class */
-    public interface CreateSessionCallback {
-        void onDone(CameraSession cameraSession);
+interface CameraSession {
+   void stop();
 
-        void onFailure(FailureType failureType, String str);
-    }
+   static int getDeviceOrientation(Context context) {
+      WindowManager wm = (WindowManager)context.getSystemService("window");
+      switch(wm.getDefaultDisplay().getRotation()) {
+      case 0:
+      default:
+         return 0;
+      case 1:
+         return 90;
+      case 2:
+         return 180;
+      case 3:
+         return 270;
+      }
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/CameraSession$Events.class */
-    public interface Events {
-        void onCameraOpening();
+   static VideoFrame.TextureBuffer createTextureBufferWithModifiedTransformMatrix(TextureBufferImpl buffer, boolean mirror, int rotation) {
+      Matrix transformMatrix = new Matrix();
+      transformMatrix.preTranslate(0.5F, 0.5F);
+      if (mirror) {
+         transformMatrix.preScale(-1.0F, 1.0F);
+      }
 
-        void onCameraError(CameraSession cameraSession, String str);
+      transformMatrix.preRotate((float)rotation);
+      transformMatrix.preTranslate(-0.5F, -0.5F);
+      return buffer.applyTransformMatrix(transformMatrix, buffer.getWidth(), buffer.getHeight());
+   }
 
-        void onCameraDisconnected(CameraSession cameraSession);
+   public interface Events {
+      void onCameraOpening();
 
-        void onCameraClosed(CameraSession cameraSession);
+      void onCameraError(CameraSession var1, String var2);
 
-        void onFrameCaptured(CameraSession cameraSession, VideoFrame videoFrame);
-    }
+      void onCameraDisconnected(CameraSession var1);
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/CameraSession$FailureType.class */
-    public enum FailureType {
-        ERROR,
-        DISCONNECTED
-    }
+      void onCameraClosed(CameraSession var1);
 
-    void stop();
+      void onFrameCaptured(CameraSession var1, VideoFrame var2);
+   }
 
-    static int getDeviceOrientation(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService("window");
-        switch (wm.getDefaultDisplay().getRotation()) {
-            case 0:
-            default:
-                return 0;
-            case 1:
-                return 90;
-            case WebRtcAudioRecord.DEFAULT_AUDIO_FORMAT /* 2 */:
-                return 180;
-            case 3:
-                return 270;
-        }
-    }
+   public interface CreateSessionCallback {
+      void onDone(CameraSession var1);
 
-    static VideoFrame.TextureBuffer createTextureBufferWithModifiedTransformMatrix(TextureBufferImpl buffer, boolean mirror, int rotation) {
-        Matrix transformMatrix = new Matrix();
-        transformMatrix.preTranslate(0.5f, 0.5f);
-        if (mirror) {
-            transformMatrix.preScale(-1.0f, 1.0f);
-        }
-        transformMatrix.preRotate(rotation);
-        transformMatrix.preTranslate(-0.5f, -0.5f);
-        return buffer.applyTransformMatrix(transformMatrix, buffer.getWidth(), buffer.getHeight());
-    }
+      void onFailure(FailureType var1, String var2);
+   }
+
+   public static enum FailureType {
+      ERROR,
+      DISCONNECTED;
+   }
 }

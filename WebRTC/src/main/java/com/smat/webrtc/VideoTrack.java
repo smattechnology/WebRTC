@@ -1,55 +1,59 @@
 package com.smat.webrtc;
 
 import java.util.IdentityHashMap;
-/* loaded from: input.aar:classes.jar:org/webrtc/VideoTrack.class */
+import java.util.Iterator;
+
 public class VideoTrack extends MediaStreamTrack {
-    private final IdentityHashMap<VideoSink, Long> sinks;
+   private final IdentityHashMap<VideoSink, Long> sinks = new IdentityHashMap();
 
-    private static native void nativeAddSink(long j, long j2);
+   public VideoTrack(long nativeTrack) {
+      super(nativeTrack);
+   }
 
-    private static native void nativeRemoveSink(long j, long j2);
-
-    private static native long nativeWrapSink(VideoSink videoSink);
-
-    private static native void nativeFreeSink(long j);
-
-    public VideoTrack(long nativeTrack) {
-        super(nativeTrack);
-        this.sinks = new IdentityHashMap<>();
-    }
-
-    public void addSink(VideoSink sink) {
-        if (sink == null) {
-            throw new IllegalArgumentException("The VideoSink is not allowed to be null");
-        }
-        if (!this.sinks.containsKey(sink)) {
+   public void addSink(VideoSink sink) {
+      if (sink == null) {
+         throw new IllegalArgumentException("The VideoSink is not allowed to be null");
+      } else {
+         if (!this.sinks.containsKey(sink)) {
             long nativeSink = nativeWrapSink(sink);
-            this.sinks.put(sink, Long.valueOf(nativeSink));
-            nativeAddSink(getNativeMediaStreamTrack(), nativeSink);
-        }
-    }
+            this.sinks.put(sink, nativeSink);
+            nativeAddSink(this.getNativeMediaStreamTrack(), nativeSink);
+         }
 
-    public void removeSink(VideoSink sink) {
-        Long nativeSink = this.sinks.remove(sink);
-        if (nativeSink != null) {
-            nativeRemoveSink(getNativeMediaStreamTrack(), nativeSink.longValue());
-            nativeFreeSink(nativeSink.longValue());
-        }
-    }
+      }
+   }
 
-    @Override // org.webrtc.MediaStreamTrack
-    public void dispose() {
-        for (Long l : this.sinks.values()) {
-            long nativeSink = l.longValue();
-            nativeRemoveSink(getNativeMediaStreamTrack(), nativeSink);
-            nativeFreeSink(nativeSink);
-        }
-        this.sinks.clear();
-        super.dispose();
-    }
+   public void removeSink(VideoSink sink) {
+      Long nativeSink = (Long)this.sinks.remove(sink);
+      if (nativeSink != null) {
+         nativeRemoveSink(this.getNativeMediaStreamTrack(), nativeSink);
+         nativeFreeSink(nativeSink);
+      }
 
-    /* JADX INFO: Access modifiers changed from: package-private */
-    public long getNativeVideoTrack() {
-        return getNativeMediaStreamTrack();
-    }
+   }
+
+   public void dispose() {
+      Iterator var1 = this.sinks.values().iterator();
+
+      while(var1.hasNext()) {
+         long nativeSink = (Long)var1.next();
+         nativeRemoveSink(this.getNativeMediaStreamTrack(), nativeSink);
+         nativeFreeSink(nativeSink);
+      }
+
+      this.sinks.clear();
+      super.dispose();
+   }
+
+   long getNativeVideoTrack() {
+      return this.getNativeMediaStreamTrack();
+   }
+
+   private static native void nativeAddSink(long var0, long var2);
+
+   private static native void nativeRemoveSink(long var0, long var2);
+
+   private static native long nativeWrapSink(VideoSink var0);
+
+   private static native void nativeFreeSink(long var0);
 }

@@ -1,9 +1,9 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/CapturerObserver.class */
+
 public interface CapturerObserver {
-    void onCapturerStarted(boolean z);
+   void onCapturerStarted(boolean var1);
 
-    void onCapturerStopped();
+   void onCapturerStopped();
 
-    void onFrameCaptured(VideoFrame videoFrame);
+   void onFrameCaptured(VideoFrame var1);
 }

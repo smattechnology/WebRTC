@@ -1,28 +1,27 @@
 package com.smat.webrtc;
-/* JADX INFO: Access modifiers changed from: package-private */
-/* loaded from: input.aar:classes.jar:org/webrtc/Histogram.class */
-public class Histogram {
-    private final long handle;
 
-    private static native long nativeCreateCounts(String str, int i, int i2, int i3);
+class Histogram {
+   private final long handle;
 
-    private static native long nativeCreateEnumeration(String str, int i);
+   private Histogram(long handle) {
+      this.handle = handle;
+   }
 
-    private static native void nativeAddSample(long j, int i);
+   public static Histogram createCounts(String name, int min, int max, int bucketCount) {
+      return new Histogram(nativeCreateCounts(name, min, max, bucketCount));
+   }
 
-    private Histogram(long handle) {
-        this.handle = handle;
-    }
+   public static Histogram createEnumeration(String name, int max) {
+      return new Histogram(nativeCreateEnumeration(name, max));
+   }
 
-    public static Histogram createCounts(String name, int min, int max, int bucketCount) {
-        return new Histogram(nativeCreateCounts(name, min, max, bucketCount));
-    }
+   public void addSample(int sample) {
+      nativeAddSample(this.handle, sample);
+   }
 
-    public static Histogram createEnumeration(String name, int max) {
-        return new Histogram(nativeCreateEnumeration(name, max));
-    }
+   private static native long nativeCreateCounts(String var0, int var1, int var2, int var3);
 
-    public void addSample(int sample) {
-        nativeAddSample(this.handle, sample);
-    }
+   private static native long nativeCreateEnumeration(String var0, int var1);
+
+   private static native void nativeAddSample(long var0, int var2);
 }

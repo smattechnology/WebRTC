@@ -1,56 +1,56 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/DtmfSender.class */
+
 public class DtmfSender {
-    private long nativeDtmfSender;
+   private long nativeDtmfSender;
 
-    private static native boolean nativeCanInsertDtmf(long j);
+   public DtmfSender(long nativeDtmfSender) {
+      this.nativeDtmfSender = nativeDtmfSender;
+   }
 
-    private static native boolean nativeInsertDtmf(long j, String str, int i, int i2);
+   public boolean canInsertDtmf() {
+      this.checkDtmfSenderExists();
+      return nativeCanInsertDtmf(this.nativeDtmfSender);
+   }
 
-    private static native String nativeTones(long j);
+   public boolean insertDtmf(String tones, int duration, int interToneGap) {
+      this.checkDtmfSenderExists();
+      return nativeInsertDtmf(this.nativeDtmfSender, tones, duration, interToneGap);
+   }
 
-    private static native int nativeDuration(long j);
+   public String tones() {
+      this.checkDtmfSenderExists();
+      return nativeTones(this.nativeDtmfSender);
+   }
 
-    private static native int nativeInterToneGap(long j);
+   public int duration() {
+      this.checkDtmfSenderExists();
+      return nativeDuration(this.nativeDtmfSender);
+   }
 
-    public DtmfSender(long nativeDtmfSender) {
-        this.nativeDtmfSender = nativeDtmfSender;
-    }
+   public int interToneGap() {
+      this.checkDtmfSenderExists();
+      return nativeInterToneGap(this.nativeDtmfSender);
+   }
 
-    public boolean canInsertDtmf() {
-        checkDtmfSenderExists();
-        return nativeCanInsertDtmf(this.nativeDtmfSender);
-    }
+   public void dispose() {
+      this.checkDtmfSenderExists();
+      JniCommon.nativeReleaseRef(this.nativeDtmfSender);
+      this.nativeDtmfSender = 0L;
+   }
 
-    public boolean insertDtmf(String tones, int duration, int interToneGap) {
-        checkDtmfSenderExists();
-        return nativeInsertDtmf(this.nativeDtmfSender, tones, duration, interToneGap);
-    }
+   private void checkDtmfSenderExists() {
+      if (this.nativeDtmfSender == 0L) {
+         throw new IllegalStateException("DtmfSender has been disposed.");
+      }
+   }
 
-    public String tones() {
-        checkDtmfSenderExists();
-        return nativeTones(this.nativeDtmfSender);
-    }
+   private static native boolean nativeCanInsertDtmf(long var0);
 
-    public int duration() {
-        checkDtmfSenderExists();
-        return nativeDuration(this.nativeDtmfSender);
-    }
+   private static native boolean nativeInsertDtmf(long var0, String var2, int var3, int var4);
 
-    public int interToneGap() {
-        checkDtmfSenderExists();
-        return nativeInterToneGap(this.nativeDtmfSender);
-    }
+   private static native String nativeTones(long var0);
 
-    public void dispose() {
-        checkDtmfSenderExists();
-        JniCommon.nativeReleaseRef(this.nativeDtmfSender);
-        this.nativeDtmfSender = 0L;
-    }
+   private static native int nativeDuration(long var0);
 
-    private void checkDtmfSenderExists() {
-        if (this.nativeDtmfSender == 0) {
-            throw new IllegalStateException("DtmfSender has been disposed.");
-        }
-    }
+   private static native int nativeInterToneGap(long var0);
 }

@@ -1,102 +1,119 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/CryptoOptions.class */
+
 public final class CryptoOptions {
-    private final Srtp srtp;
-    private final SFrame sframe;
+   private final Srtp srtp;
+   private final SFrame sframe;
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/CryptoOptions$Srtp.class */
-    public final class Srtp {
-        private final boolean enableGcmCryptoSuites;
-        private final boolean enableAes128Sha1_32CryptoCipher;
-        private final boolean enableEncryptedRtpHeaderExtensions;
+   private CryptoOptions(boolean enableGcmCryptoSuites, boolean enableAes128Sha1_32CryptoCipher, boolean enableEncryptedRtpHeaderExtensions, boolean requireFrameEncryption) {
+      this.srtp = new Srtp(enableGcmCryptoSuites, enableAes128Sha1_32CryptoCipher, enableEncryptedRtpHeaderExtensions);
+      this.sframe = new SFrame(requireFrameEncryption);
+   }
 
-        private Srtp(boolean enableGcmCryptoSuites, boolean enableAes128Sha1_32CryptoCipher, boolean enableEncryptedRtpHeaderExtensions) {
-            this.enableGcmCryptoSuites = enableGcmCryptoSuites;
-            this.enableAes128Sha1_32CryptoCipher = enableAes128Sha1_32CryptoCipher;
-            this.enableEncryptedRtpHeaderExtensions = enableEncryptedRtpHeaderExtensions;
-        }
+   public static Builder builder() {
+      return new Builder();
+   }
 
-        @CalledByNative("Srtp")
-        public boolean getEnableGcmCryptoSuites() {
-            return this.enableGcmCryptoSuites;
-        }
+   @CalledByNative
+   public Srtp getSrtp() {
+      return this.srtp;
+   }
 
-        @CalledByNative("Srtp")
-        public boolean getEnableAes128Sha1_32CryptoCipher() {
-            return this.enableAes128Sha1_32CryptoCipher;
-        }
+   @CalledByNative
+   public SFrame getSFrame() {
+      return this.sframe;
+   }
 
-        @CalledByNative("Srtp")
-        public boolean getEnableEncryptedRtpHeaderExtensions() {
-            return this.enableEncryptedRtpHeaderExtensions;
-        }
-    }
+   // $FF: synthetic method
+   CryptoOptions(boolean x0, boolean x1, boolean x2, boolean x3, Object x4) {
+      this(x0, x1, x2, x3);
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/CryptoOptions$SFrame.class */
-    public final class SFrame {
-        private final boolean requireFrameEncryption;
+   public static class Builder {
+      private boolean enableGcmCryptoSuites;
+      private boolean enableAes128Sha1_32CryptoCipher;
+      private boolean enableEncryptedRtpHeaderExtensions;
+      private boolean requireFrameEncryption;
 
-        private SFrame(boolean requireFrameEncryption) {
-            this.requireFrameEncryption = requireFrameEncryption;
-        }
+      private Builder() {
+      }
 
-        @CalledByNative("SFrame")
-        public boolean getRequireFrameEncryption() {
-            return this.requireFrameEncryption;
-        }
-    }
+      public Builder setEnableGcmCryptoSuites(boolean enableGcmCryptoSuites) {
+         this.enableGcmCryptoSuites = enableGcmCryptoSuites;
+         return this;
+      }
 
-    private CryptoOptions(boolean enableGcmCryptoSuites, boolean enableAes128Sha1_32CryptoCipher, boolean enableEncryptedRtpHeaderExtensions, boolean requireFrameEncryption) {
-        this.srtp = new Srtp(enableGcmCryptoSuites, enableAes128Sha1_32CryptoCipher, enableEncryptedRtpHeaderExtensions);
-        this.sframe = new SFrame(requireFrameEncryption);
-    }
+      public Builder setEnableAes128Sha1_32CryptoCipher(boolean enableAes128Sha1_32CryptoCipher) {
+         this.enableAes128Sha1_32CryptoCipher = enableAes128Sha1_32CryptoCipher;
+         return this;
+      }
 
-    public static Builder builder() {
-        return new Builder();
-    }
+      public Builder setEnableEncryptedRtpHeaderExtensions(boolean enableEncryptedRtpHeaderExtensions) {
+         this.enableEncryptedRtpHeaderExtensions = enableEncryptedRtpHeaderExtensions;
+         return this;
+      }
 
-    @CalledByNative
-    public Srtp getSrtp() {
-        return this.srtp;
-    }
+      public Builder setRequireFrameEncryption(boolean requireFrameEncryption) {
+         this.requireFrameEncryption = requireFrameEncryption;
+         return this;
+      }
 
-    @CalledByNative
-    public SFrame getSFrame() {
-        return this.sframe;
-    }
+      public CryptoOptions createCryptoOptions() {
+         return new CryptoOptions(this.enableGcmCryptoSuites, this.enableAes128Sha1_32CryptoCipher, this.enableEncryptedRtpHeaderExtensions, this.requireFrameEncryption);
+      }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/CryptoOptions$Builder.class */
-    public static class Builder {
-        private boolean enableGcmCryptoSuites;
-        private boolean enableAes128Sha1_32CryptoCipher;
-        private boolean enableEncryptedRtpHeaderExtensions;
-        private boolean requireFrameEncryption;
+      // $FF: synthetic method
+      Builder(Object x0) {
+         this();
+      }
+   }
 
-        private Builder() {
-        }
+   public final class SFrame {
+      private final boolean requireFrameEncryption;
 
-        public Builder setEnableGcmCryptoSuites(boolean enableGcmCryptoSuites) {
-            this.enableGcmCryptoSuites = enableGcmCryptoSuites;
-            return this;
-        }
+      private SFrame(boolean requireFrameEncryption) {
+         this.requireFrameEncryption = requireFrameEncryption;
+      }
 
-        public Builder setEnableAes128Sha1_32CryptoCipher(boolean enableAes128Sha1_32CryptoCipher) {
-            this.enableAes128Sha1_32CryptoCipher = enableAes128Sha1_32CryptoCipher;
-            return this;
-        }
+      @CalledByNative("SFrame")
+      public boolean getRequireFrameEncryption() {
+         return this.requireFrameEncryption;
+      }
 
-        public Builder setEnableEncryptedRtpHeaderExtensions(boolean enableEncryptedRtpHeaderExtensions) {
-            this.enableEncryptedRtpHeaderExtensions = enableEncryptedRtpHeaderExtensions;
-            return this;
-        }
+      // $FF: synthetic method
+      SFrame(boolean x1, Object x2) {
+         this(x1);
+      }
+   }
 
-        public Builder setRequireFrameEncryption(boolean requireFrameEncryption) {
-            this.requireFrameEncryption = requireFrameEncryption;
-            return this;
-        }
+   public final class Srtp {
+      private final boolean enableGcmCryptoSuites;
+      private final boolean enableAes128Sha1_32CryptoCipher;
+      private final boolean enableEncryptedRtpHeaderExtensions;
 
-        public CryptoOptions createCryptoOptions() {
-            return new CryptoOptions(this.enableGcmCryptoSuites, this.enableAes128Sha1_32CryptoCipher, this.enableEncryptedRtpHeaderExtensions, this.requireFrameEncryption);
-        }
-    }
+      private Srtp(boolean enableGcmCryptoSuites, boolean enableAes128Sha1_32CryptoCipher, boolean enableEncryptedRtpHeaderExtensions) {
+         this.enableGcmCryptoSuites = enableGcmCryptoSuites;
+         this.enableAes128Sha1_32CryptoCipher = enableAes128Sha1_32CryptoCipher;
+         this.enableEncryptedRtpHeaderExtensions = enableEncryptedRtpHeaderExtensions;
+      }
+
+      @CalledByNative("Srtp")
+      public boolean getEnableGcmCryptoSuites() {
+         return this.enableGcmCryptoSuites;
+      }
+
+      @CalledByNative("Srtp")
+      public boolean getEnableAes128Sha1_32CryptoCipher() {
+         return this.enableAes128Sha1_32CryptoCipher;
+      }
+
+      @CalledByNative("Srtp")
+      public boolean getEnableEncryptedRtpHeaderExtensions() {
+         return this.enableEncryptedRtpHeaderExtensions;
+      }
+
+      // $FF: synthetic method
+      Srtp(boolean x1, boolean x2, boolean x3, Object x4) {
+         this(x1, x2, x3);
+      }
+   }
 }

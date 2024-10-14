@@ -1,34 +1,35 @@
 package com.smat.webrtc;
 
-import org.webrtc.Logging;
-/* loaded from: input.aar:classes.jar:org/webrtc/CallSessionFileRotatingLogSink.class */
 public class CallSessionFileRotatingLogSink {
-    private long nativeSink;
+   private long nativeSink;
 
-    private static native long nativeAddSink(String str, int i, int i2);
+   public static byte[] getLogData(String dirPath) {
+      if (dirPath == null) {
+         throw new IllegalArgumentException("dirPath may not be null.");
+      } else {
+         return nativeGetLogData(dirPath);
+      }
+   }
 
-    private static native void nativeDeleteSink(long j);
+   public CallSessionFileRotatingLogSink(String dirPath, int maxFileSize, Logging.Severity severity) {
+      if (dirPath == null) {
+         throw new IllegalArgumentException("dirPath may not be null.");
+      } else {
+         this.nativeSink = nativeAddSink(dirPath, maxFileSize, severity.ordinal());
+      }
+   }
 
-    private static native byte[] nativeGetLogData(String str);
+   public void dispose() {
+      if (this.nativeSink != 0L) {
+         nativeDeleteSink(this.nativeSink);
+         this.nativeSink = 0L;
+      }
 
-    public static byte[] getLogData(String dirPath) {
-        if (dirPath == null) {
-            throw new IllegalArgumentException("dirPath may not be null.");
-        }
-        return nativeGetLogData(dirPath);
-    }
+   }
 
-    public CallSessionFileRotatingLogSink(String dirPath, int maxFileSize, Logging.Severity severity) {
-        if (dirPath == null) {
-            throw new IllegalArgumentException("dirPath may not be null.");
-        }
-        this.nativeSink = nativeAddSink(dirPath, maxFileSize, severity.ordinal());
-    }
+   private static native long nativeAddSink(String var0, int var1, int var2);
 
-    public void dispose() {
-        if (this.nativeSink != 0) {
-            nativeDeleteSink(this.nativeSink);
-            this.nativeSink = 0L;
-        }
-    }
+   private static native void nativeDeleteSink(long var0);
+
+   private static native byte[] nativeGetLogData(String var0);
 }

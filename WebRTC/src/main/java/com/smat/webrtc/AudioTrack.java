@@ -1,18 +1,17 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/AudioTrack.class */
+
 public class AudioTrack extends MediaStreamTrack {
-    private static native void nativeSetVolume(long j, double d);
+   public AudioTrack(long nativeTrack) {
+      super(nativeTrack);
+   }
 
-    public AudioTrack(long nativeTrack) {
-        super(nativeTrack);
-    }
+   public void setVolume(double volume) {
+      nativeSetVolume(this.getNativeAudioTrack(), volume);
+   }
 
-    public void setVolume(double volume) {
-        nativeSetVolume(getNativeAudioTrack(), volume);
-    }
+   long getNativeAudioTrack() {
+      return this.getNativeMediaStreamTrack();
+   }
 
-    /* JADX INFO: Access modifiers changed from: package-private */
-    public long getNativeAudioTrack() {
-        return getNativeMediaStreamTrack();
-    }
+   private static native void nativeSetVolume(long var0, double var2);
 }

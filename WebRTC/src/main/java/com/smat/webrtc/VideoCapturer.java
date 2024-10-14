@@ -1,17 +1,17 @@
 package com.smat.webrtc;
 
 import android.content.Context;
-/* loaded from: input.aar:classes.jar:org/webrtc/VideoCapturer.class */
+
 public interface VideoCapturer {
-    void initialize(SurfaceTextureHelper surfaceTextureHelper, Context context, CapturerObserver capturerObserver);
+   void initialize(SurfaceTextureHelper var1, Context var2, CapturerObserver var3);
 
-    void startCapture(int i, int i2, int i3);
+   void startCapture(int var1, int var2, int var3);
 
-    void stopCapture() throws InterruptedException;
+   void stopCapture() throws InterruptedException;
 
-    void changeCaptureFormat(int i, int i2, int i3);
+   void changeCaptureFormat(int var1, int var2, int var3);
 
-    void dispose();
+   void dispose();
 
-    boolean isScreencast();
+   boolean isScreencast();
 }

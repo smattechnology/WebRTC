@@ -1,18 +1,15 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/LibvpxVp9Encoder.class */
+
 public class LibvpxVp9Encoder extends WrappedNativeVideoEncoder {
-    static native long nativeCreateEncoder();
+   public long createNativeVideoEncoder() {
+      return nativeCreateEncoder();
+   }
 
-    /* JADX INFO: Access modifiers changed from: package-private */
-    public static native boolean nativeIsSupported();
+   static native long nativeCreateEncoder();
 
-    @Override // org.webrtc.WrappedNativeVideoEncoder, org.webrtc.VideoEncoder
-    public long createNativeVideoEncoder() {
-        return nativeCreateEncoder();
-    }
+   public boolean isHardwareEncoder() {
+      return false;
+   }
 
-    @Override // org.webrtc.WrappedNativeVideoEncoder, org.webrtc.VideoEncoder
-    public boolean isHardwareEncoder() {
-        return false;
-    }
+   static native boolean nativeIsSupported();
 }

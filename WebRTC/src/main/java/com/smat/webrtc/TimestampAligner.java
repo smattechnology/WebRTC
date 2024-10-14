@@ -1,34 +1,34 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/TimestampAligner.class */
+
 public class TimestampAligner {
-    private volatile long nativeTimestampAligner = nativeCreateTimestampAligner();
+   private volatile long nativeTimestampAligner = nativeCreateTimestampAligner();
 
-    private static native long nativeRtcTimeNanos();
+   public static long getRtcTimeNanos() {
+      return nativeRtcTimeNanos();
+   }
 
-    private static native long nativeCreateTimestampAligner();
+   public long translateTimestamp(long cameraTimeNs) {
+      this.checkNativeAlignerExists();
+      return nativeTranslateTimestamp(this.nativeTimestampAligner, cameraTimeNs);
+   }
 
-    private static native void nativeReleaseTimestampAligner(long j);
+   public void dispose() {
+      this.checkNativeAlignerExists();
+      nativeReleaseTimestampAligner(this.nativeTimestampAligner);
+      this.nativeTimestampAligner = 0L;
+   }
 
-    private static native long nativeTranslateTimestamp(long j, long j2);
+   private void checkNativeAlignerExists() {
+      if (this.nativeTimestampAligner == 0L) {
+         throw new IllegalStateException("TimestampAligner has been disposed.");
+      }
+   }
 
-    public static long getRtcTimeNanos() {
-        return nativeRtcTimeNanos();
-    }
+   private static native long nativeRtcTimeNanos();
 
-    public long translateTimestamp(long cameraTimeNs) {
-        checkNativeAlignerExists();
-        return nativeTranslateTimestamp(this.nativeTimestampAligner, cameraTimeNs);
-    }
+   private static native long nativeCreateTimestampAligner();
 
-    public void dispose() {
-        checkNativeAlignerExists();
-        nativeReleaseTimestampAligner(this.nativeTimestampAligner);
-        this.nativeTimestampAligner = 0L;
-    }
+   private static native void nativeReleaseTimestampAligner(long var0);
 
-    private void checkNativeAlignerExists() {
-        if (this.nativeTimestampAligner == 0) {
-            throw new IllegalStateException("TimestampAligner has been disposed.");
-        }
-    }
+   private static native long nativeTranslateTimestamp(long var0, long var2);
 }

@@ -2,131 +2,117 @@ package com.smat.webrtc;
 
 import android.graphics.Matrix;
 import java.nio.ByteBuffer;
-/* loaded from: input.aar:classes.jar:org/webrtc/VideoFrame.class */
+
 public class VideoFrame implements RefCounted {
-    private final Buffer buffer;
-    private final int rotation;
-    private final long timestampNs;
+   private final Buffer buffer;
+   private final int rotation;
+   private final long timestampNs;
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoFrame$Buffer.class */
-    public interface Buffer extends RefCounted {
-        @CalledByNative("Buffer")
-        int getWidth();
+   @CalledByNative
+   public VideoFrame(Buffer buffer, int rotation, long timestampNs) {
+      if (buffer == null) {
+         throw new IllegalArgumentException("buffer not allowed to be null");
+      } else if (rotation % 90 != 0) {
+         throw new IllegalArgumentException("rotation must be a multiple of 90");
+      } else {
+         this.buffer = buffer;
+         this.rotation = rotation;
+         this.timestampNs = timestampNs;
+      }
+   }
 
-        @CalledByNative("Buffer")
-        int getHeight();
+   @CalledByNative
+   public Buffer getBuffer() {
+      return this.buffer;
+   }
 
-        @CalledByNative("Buffer")
-        I420Buffer toI420();
+   @CalledByNative
+   public int getRotation() {
+      return this.rotation;
+   }
 
-        @Override // org.webrtc.RefCounted
-        @CalledByNative("Buffer")
-        void retain();
+   @CalledByNative
+   public long getTimestampNs() {
+      return this.timestampNs;
+   }
 
-        @Override // org.webrtc.RefCounted
-        @CalledByNative("Buffer")
-        void release();
+   public int getRotatedWidth() {
+      return this.rotation % 180 == 0 ? this.buffer.getWidth() : this.buffer.getHeight();
+   }
 
-        @CalledByNative("Buffer")
-        Buffer cropAndScale(int i, int i2, int i3, int i4, int i5, int i6);
-    }
+   public int getRotatedHeight() {
+      return this.rotation % 180 == 0 ? this.buffer.getHeight() : this.buffer.getWidth();
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoFrame$I420Buffer.class */
-    public interface I420Buffer extends Buffer {
-        @CalledByNative("I420Buffer")
-        ByteBuffer getDataY();
+   public void retain() {
+      this.buffer.retain();
+   }
 
-        @CalledByNative("I420Buffer")
-        ByteBuffer getDataU();
+   @CalledByNative
+   public void release() {
+      this.buffer.release();
+   }
 
-        @CalledByNative("I420Buffer")
-        ByteBuffer getDataV();
+   public interface TextureBuffer extends Buffer {
+      Type getType();
 
-        @CalledByNative("I420Buffer")
-        int getStrideY();
+      int getTextureId();
 
-        @CalledByNative("I420Buffer")
-        int getStrideU();
+      Matrix getTransformMatrix();
 
-        @CalledByNative("I420Buffer")
-        int getStrideV();
-    }
+      public static enum Type {
+         OES(36197),
+         RGB(3553);
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoFrame$TextureBuffer.class */
-    public interface TextureBuffer extends Buffer {
-        Type getType();
+         private final int glTarget;
 
-        int getTextureId();
+         private Type(int glTarget) {
+            this.glTarget = glTarget;
+         }
 
-        Matrix getTransformMatrix();
+         public int getGlTarget() {
+            return this.glTarget;
+         }
+      }
+   }
 
-        /* loaded from: input.aar:classes.jar:org/webrtc/VideoFrame$TextureBuffer$Type.class */
-        public enum Type {
-            OES(36197),
-            RGB(3553);
-            
-            private final int glTarget;
+   public interface I420Buffer extends Buffer {
+      @CalledByNative("I420Buffer")
+      ByteBuffer getDataY();
 
-            Type(int glTarget) {
-                this.glTarget = glTarget;
-            }
+      @CalledByNative("I420Buffer")
+      ByteBuffer getDataU();
 
-            public int getGlTarget() {
-                return this.glTarget;
-            }
-        }
-    }
+      @CalledByNative("I420Buffer")
+      ByteBuffer getDataV();
 
-    @CalledByNative
-    public VideoFrame(Buffer buffer, int rotation, long timestampNs) {
-        if (buffer == null) {
-            throw new IllegalArgumentException("buffer not allowed to be null");
-        }
-        if (rotation % 90 != 0) {
-            throw new IllegalArgumentException("rotation must be a multiple of 90");
-        }
-        this.buffer = buffer;
-        this.rotation = rotation;
-        this.timestampNs = timestampNs;
-    }
+      @CalledByNative("I420Buffer")
+      int getStrideY();
 
-    @CalledByNative
-    public Buffer getBuffer() {
-        return this.buffer;
-    }
+      @CalledByNative("I420Buffer")
+      int getStrideU();
 
-    @CalledByNative
-    public int getRotation() {
-        return this.rotation;
-    }
+      @CalledByNative("I420Buffer")
+      int getStrideV();
+   }
 
-    @CalledByNative
-    public long getTimestampNs() {
-        return this.timestampNs;
-    }
+   public interface Buffer extends RefCounted {
+      @CalledByNative("Buffer")
+      int getWidth();
 
-    public int getRotatedWidth() {
-        if (this.rotation % 180 == 0) {
-            return this.buffer.getWidth();
-        }
-        return this.buffer.getHeight();
-    }
+      @CalledByNative("Buffer")
+      int getHeight();
 
-    public int getRotatedHeight() {
-        if (this.rotation % 180 == 0) {
-            return this.buffer.getHeight();
-        }
-        return this.buffer.getWidth();
-    }
+      @CalledByNative("Buffer")
+      I420Buffer toI420();
 
-    @Override // org.webrtc.RefCounted
-    public void retain() {
-        this.buffer.retain();
-    }
+      @CalledByNative("Buffer")
+      void retain();
 
-    @Override // org.webrtc.RefCounted
-    @CalledByNative
-    public void release() {
-        this.buffer.release();
-    }
+      @CalledByNative("Buffer")
+      void release();
+
+      @CalledByNative("Buffer")
+      Buffer cropAndScale(int var1, int var2, int var3, int var4, int var5, int var6);
+   }
 }

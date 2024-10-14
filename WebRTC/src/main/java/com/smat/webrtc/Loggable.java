@@ -1,7 +1,5 @@
 package com.smat.webrtc;
 
-import org.webrtc.Logging;
-/* loaded from: input.aar:classes.jar:org/webrtc/Loggable.class */
 public interface Loggable {
-    void onLogMessage(String str, Logging.Severity severity, String str2);
+   void onLogMessage(String var1, Logging.Severity var2, String var3);
 }

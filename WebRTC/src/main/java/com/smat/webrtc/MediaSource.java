@@ -1,47 +1,45 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/MediaSource.class */
+
 public class MediaSource {
-    private long nativeSource;
+   private long nativeSource;
 
-    private static native State nativeGetState(long j);
+   public MediaSource(long nativeSource) {
+      this.nativeSource = nativeSource;
+   }
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/MediaSource$State.class */
-    public enum State {
-        INITIALIZING,
-        LIVE,
-        ENDED,
-        MUTED;
+   public State state() {
+      this.checkMediaSourceExists();
+      return nativeGetState(this.nativeSource);
+   }
 
-        @CalledByNative("State")
-        static State fromNativeIndex(int nativeIndex) {
-            return values()[nativeIndex];
-        }
-    }
+   public void dispose() {
+      this.checkMediaSourceExists();
+      JniCommon.nativeReleaseRef(this.nativeSource);
+      this.nativeSource = 0L;
+   }
 
-    public MediaSource(long nativeSource) {
-        this.nativeSource = nativeSource;
-    }
+   protected long getNativeMediaSource() {
+      this.checkMediaSourceExists();
+      return this.nativeSource;
+   }
 
-    public State state() {
-        checkMediaSourceExists();
-        return nativeGetState(this.nativeSource);
-    }
+   private void checkMediaSourceExists() {
+      if (this.nativeSource == 0L) {
+         throw new IllegalStateException("MediaSource has been disposed.");
+      }
+   }
 
-    public void dispose() {
-        checkMediaSourceExists();
-        JniCommon.nativeReleaseRef(this.nativeSource);
-        this.nativeSource = 0L;
-    }
+   private static native State nativeGetState(long var0);
 
-    /* JADX INFO: Access modifiers changed from: protected */
-    public long getNativeMediaSource() {
-        checkMediaSourceExists();
-        return this.nativeSource;
-    }
+   public static enum State {
+      INITIALIZING,
+      LIVE,
+      ENDED,
+      MUTED;
 
-    private void checkMediaSourceExists() {
-        if (this.nativeSource == 0) {
-            throw new IllegalStateException("MediaSource has been disposed.");
-        }
-    }
+      @CalledByNative("State")
+      static State fromNativeIndex(int nativeIndex) {
+         return values()[nativeIndex];
+      }
+   }
 }

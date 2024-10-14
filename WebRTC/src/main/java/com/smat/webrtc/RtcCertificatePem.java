@@ -1,43 +1,41 @@
 package com.smat.webrtc;
 
-import org.webrtc.PeerConnection;
-/* loaded from: input.aar:classes.jar:org/webrtc/RtcCertificatePem.class */
 public class RtcCertificatePem {
-    public final String privateKey;
-    public final String certificate;
-    private static final long DEFAULT_EXPIRY = 2592000;
+   public final String privateKey;
+   public final String certificate;
+   private static final long DEFAULT_EXPIRY = 2592000L;
 
-    private static native RtcCertificatePem nativeGenerateCertificate(PeerConnection.KeyType keyType, long j);
+   @CalledByNative
+   public RtcCertificatePem(String privateKey, String certificate) {
+      this.privateKey = privateKey;
+      this.certificate = certificate;
+   }
 
-    @CalledByNative
-    public RtcCertificatePem(String privateKey, String certificate) {
-        this.privateKey = privateKey;
-        this.certificate = certificate;
-    }
+   @CalledByNative
+   String getPrivateKey() {
+      return this.privateKey;
+   }
 
-    @CalledByNative
-    String getPrivateKey() {
-        return this.privateKey;
-    }
+   @CalledByNative
+   String getCertificate() {
+      return this.certificate;
+   }
 
-    @CalledByNative
-    String getCertificate() {
-        return this.certificate;
-    }
+   public static RtcCertificatePem generateCertificate() {
+      return nativeGenerateCertificate(PeerConnection.KeyType.ECDSA, 2592000L);
+   }
 
-    public static RtcCertificatePem generateCertificate() {
-        return nativeGenerateCertificate(PeerConnection.KeyType.ECDSA, DEFAULT_EXPIRY);
-    }
+   public static RtcCertificatePem generateCertificate(PeerConnection.KeyType keyType) {
+      return nativeGenerateCertificate(keyType, 2592000L);
+   }
 
-    public static RtcCertificatePem generateCertificate(PeerConnection.KeyType keyType) {
-        return nativeGenerateCertificate(keyType, DEFAULT_EXPIRY);
-    }
+   public static RtcCertificatePem generateCertificate(long expires) {
+      return nativeGenerateCertificate(PeerConnection.KeyType.ECDSA, expires);
+   }
 
-    public static RtcCertificatePem generateCertificate(long expires) {
-        return nativeGenerateCertificate(PeerConnection.KeyType.ECDSA, expires);
-    }
+   public static RtcCertificatePem generateCertificate(PeerConnection.KeyType keyType, long expires) {
+      return nativeGenerateCertificate(keyType, expires);
+   }
 
-    public static RtcCertificatePem generateCertificate(PeerConnection.KeyType keyType, long expires) {
-        return nativeGenerateCertificate(keyType, expires);
-    }
+   private static native RtcCertificatePem nativeGenerateCertificate(PeerConnection.KeyType var0, long var1);
 }

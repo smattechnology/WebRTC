@@ -1,38 +1,38 @@
 package com.smat.webrtc;
 
-import android.media.MediaCodec;
 import android.media.MediaCrypto;
 import android.media.MediaFormat;
+import android.media.MediaCodec.BufferInfo;
 import android.os.Bundle;
 import android.view.Surface;
 import java.nio.ByteBuffer;
-/* loaded from: input.aar:classes.jar:org/webrtc/MediaCodecWrapper.class */
+
 interface MediaCodecWrapper {
-    void configure(MediaFormat mediaFormat, Surface surface, MediaCrypto mediaCrypto, int i);
+   void configure(MediaFormat var1, Surface var2, MediaCrypto var3, int var4);
 
-    void start();
+   void start();
 
-    void flush();
+   void flush();
 
-    void stop();
+   void stop();
 
-    void release();
+   void release();
 
-    int dequeueInputBuffer(long j);
+   int dequeueInputBuffer(long var1);
 
-    void queueInputBuffer(int i, int i2, int i3, long j, int i4);
+   void queueInputBuffer(int var1, int var2, int var3, long var4, int var6);
 
-    int dequeueOutputBuffer(MediaCodec.BufferInfo bufferInfo, long j);
+   int dequeueOutputBuffer(BufferInfo var1, long var2);
 
-    void releaseOutputBuffer(int i, boolean z);
+   void releaseOutputBuffer(int var1, boolean var2);
 
-    MediaFormat getOutputFormat();
+   MediaFormat getOutputFormat();
 
-    ByteBuffer[] getInputBuffers();
+   ByteBuffer[] getInputBuffers();
 
-    ByteBuffer[] getOutputBuffers();
+   ByteBuffer[] getOutputBuffers();
 
-    Surface createInputSurface();
+   Surface createInputSurface();
 
-    void setParameters(Bundle bundle);
+   void setParameters(Bundle var1);
 }

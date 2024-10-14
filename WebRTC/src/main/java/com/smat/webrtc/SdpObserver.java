@@ -1,15 +1,15 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/SdpObserver.class */
+
 public interface SdpObserver {
-    @CalledByNative
-    void onCreateSuccess(SessionDescription sessionDescription);
+   @CalledByNative
+   void onCreateSuccess(SessionDescription var1);
 
-    @CalledByNative
-    void onSetSuccess();
+   @CalledByNative
+   void onSetSuccess();
 
-    @CalledByNative
-    void onCreateFailure(String str);
+   @CalledByNative
+   void onCreateFailure(String var1);
 
-    @CalledByNative
-    void onSetFailure(String str);
+   @CalledByNative
+   void onSetFailure(String var1);
 }

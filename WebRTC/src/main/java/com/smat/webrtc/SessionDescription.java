@@ -1,40 +1,39 @@
 package com.smat.webrtc;
 
 import java.util.Locale;
-/* loaded from: input.aar:classes.jar:org/webrtc/SessionDescription.class */
+
 public class SessionDescription {
-    public final Type type;
-    public final String description;
+   public final Type type;
+   public final String description;
 
-    /* loaded from: input.aar:classes.jar:org/webrtc/SessionDescription$Type.class */
-    public enum Type {
-        OFFER,
-        PRANSWER,
-        ANSWER;
+   @CalledByNative
+   public SessionDescription(Type type, String description) {
+      this.type = type;
+      this.description = description;
+   }
 
-        public String canonicalForm() {
-            return name().toLowerCase(Locale.US);
-        }
+   @CalledByNative
+   String getDescription() {
+      return this.description;
+   }
 
-        @CalledByNative("Type")
-        public static Type fromCanonicalForm(String canonical) {
-            return (Type) valueOf(Type.class, canonical.toUpperCase(Locale.US));
-        }
-    }
+   @CalledByNative
+   String getTypeInCanonicalForm() {
+      return this.type.canonicalForm();
+   }
 
-    @CalledByNative
-    public SessionDescription(Type type, String description) {
-        this.type = type;
-        this.description = description;
-    }
+   public static enum Type {
+      OFFER,
+      PRANSWER,
+      ANSWER;
 
-    @CalledByNative
-    String getDescription() {
-        return this.description;
-    }
+      public String canonicalForm() {
+         return this.name().toLowerCase(Locale.US);
+      }
 
-    @CalledByNative
-    String getTypeInCanonicalForm() {
-        return this.type.canonicalForm();
-    }
+      @CalledByNative("Type")
+      public static Type fromCanonicalForm(String canonical) {
+         return (Type)valueOf(Type.class, canonical.toUpperCase(Locale.US));
+      }
+   }
 }

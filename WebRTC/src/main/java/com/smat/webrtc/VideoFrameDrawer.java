@@ -3,200 +3,191 @@ package com.smat.webrtc;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.opengl.GLES20;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import java.nio.ByteBuffer;
-import org.webrtc.RendererCommon;
-import org.webrtc.VideoFrame;
-import org.webrtc.audio.WebRtcAudioRecord;
-/* loaded from: input.aar:classes.jar:org/webrtc/VideoFrameDrawer.class */
+
 public class VideoFrameDrawer {
-    public static final String TAG = "VideoFrameDrawer";
-    static final float[] srcPoints = {0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
-    private int renderWidth;
-    private int renderHeight;
-    @Nullable
-    private VideoFrame lastI420Frame;
-    private final float[] dstPoints = new float[6];
-    private final Point renderSize = new Point();
-    private final YuvUploader yuvUploader = new YuvUploader(null);
-    private final Matrix renderMatrix = new Matrix();
+   public static final String TAG = "VideoFrameDrawer";
+   static final float[] srcPoints = new float[]{0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F};
+   private final float[] dstPoints = new float[6];
+   private final Point renderSize = new Point();
+   private int renderWidth;
+   private int renderHeight;
+   private final YuvUploader yuvUploader = new YuvUploader();
+   @Nullable
+   private VideoFrame lastI420Frame;
+   private final Matrix renderMatrix = new Matrix();
 
-    public static void drawTexture(RendererCommon.GlDrawer drawer, VideoFrame.TextureBuffer buffer, Matrix renderMatrix, int frameWidth, int frameHeight, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
-        Matrix finalMatrix = new Matrix(buffer.getTransformMatrix());
-        finalMatrix.preConcat(renderMatrix);
-        float[] finalGlMatrix = RendererCommon.convertMatrixFromAndroidGraphicsMatrix(finalMatrix);
-        switch (AnonymousClass1.$SwitchMap$org$webrtc$VideoFrame$TextureBuffer$Type[buffer.getType().ordinal()]) {
-            case 1:
-                drawer.drawOes(buffer.getTextureId(), finalGlMatrix, frameWidth, frameHeight, viewportX, viewportY, viewportWidth, viewportHeight);
-                return;
-            case WebRtcAudioRecord.DEFAULT_AUDIO_FORMAT /* 2 */:
-                drawer.drawRgb(buffer.getTextureId(), finalGlMatrix, frameWidth, frameHeight, viewportX, viewportY, viewportWidth, viewportHeight);
-                return;
-            default:
-                throw new RuntimeException("Unknown texture type.");
-        }
-    }
+   public static void drawTexture(RendererCommon.GlDrawer drawer, VideoFrame.TextureBuffer buffer, Matrix renderMatrix, int frameWidth, int frameHeight, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+      Matrix finalMatrix = new Matrix(buffer.getTransformMatrix());
+      finalMatrix.preConcat(renderMatrix);
+      float[] finalGlMatrix = RendererCommon.convertMatrixFromAndroidGraphicsMatrix(finalMatrix);
+      switch(buffer.getType()) {
+      case OES:
+         drawer.drawOes(buffer.getTextureId(), finalGlMatrix, frameWidth, frameHeight, viewportX, viewportY, viewportWidth, viewportHeight);
+         break;
+      case RGB:
+         drawer.drawRgb(buffer.getTextureId(), finalGlMatrix, frameWidth, frameHeight, viewportX, viewportY, viewportWidth, viewportHeight);
+         break;
+      default:
+         throw new RuntimeException("Unknown texture type.");
+      }
 
-    /* JADX INFO: Access modifiers changed from: package-private */
-    /* renamed from: org.webrtc.VideoFrameDrawer$1  reason: invalid class name */
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoFrameDrawer$1.class */
-    public static /* synthetic */ class AnonymousClass1 {
-        static final /* synthetic */ int[] $SwitchMap$org$webrtc$VideoFrame$TextureBuffer$Type = new int[VideoFrame.TextureBuffer.Type.values().length];
+   }
 
-        static {
-            try {
-                $SwitchMap$org$webrtc$VideoFrame$TextureBuffer$Type[VideoFrame.TextureBuffer.Type.OES.ordinal()] = 1;
-            } catch (NoSuchFieldError e) {
-            }
-            try {
-                $SwitchMap$org$webrtc$VideoFrame$TextureBuffer$Type[VideoFrame.TextureBuffer.Type.RGB.ordinal()] = 2;
-            } catch (NoSuchFieldError e2) {
-            }
-        }
-    }
+   private static int distance(float x0, float y0, float x1, float y1) {
+      return (int)Math.round(Math.hypot((double)(x1 - x0), (double)(y1 - y0)));
+   }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    /* loaded from: input.aar:classes.jar:org/webrtc/VideoFrameDrawer$YuvUploader.class */
-    public static class YuvUploader {
-        @Nullable
-        private ByteBuffer copyBuffer;
-        @Nullable
-        private int[] yuvTextures;
+   private void calculateTransformedRenderSize(int frameWidth, int frameHeight, @Nullable Matrix renderMatrix) {
+      if (renderMatrix == null) {
+         this.renderWidth = frameWidth;
+         this.renderHeight = frameHeight;
+      } else {
+         renderMatrix.mapPoints(this.dstPoints, srcPoints);
 
-        private YuvUploader() {
-        }
+         for(int i = 0; i < 3; ++i) {
+            float[] var10000 = this.dstPoints;
+            var10000[i * 2 + 0] *= (float)frameWidth;
+            var10000 = this.dstPoints;
+            var10000[i * 2 + 1] *= (float)frameHeight;
+         }
 
-        /* synthetic */ YuvUploader(AnonymousClass1 x0) {
-            this();
-        }
+         this.renderWidth = distance(this.dstPoints[0], this.dstPoints[1], this.dstPoints[2], this.dstPoints[3]);
+         this.renderHeight = distance(this.dstPoints[0], this.dstPoints[1], this.dstPoints[4], this.dstPoints[5]);
+      }
+   }
 
-        @Nullable
-        public int[] uploadYuvData(int width, int height, int[] strides, ByteBuffer[] planes) {
-            ByteBuffer byteBuffer;
-            int[] planeWidths = {width, width / 2, width / 2};
-            int[] planeHeights = {height, height / 2, height / 2};
-            int copyCapacityNeeded = 0;
-            for (int i = 0; i < 3; i++) {
-                if (strides[i] > planeWidths[i]) {
-                    copyCapacityNeeded = Math.max(copyCapacityNeeded, planeWidths[i] * planeHeights[i]);
-                }
-            }
-            if (copyCapacityNeeded > 0 && (this.copyBuffer == null || this.copyBuffer.capacity() < copyCapacityNeeded)) {
-                this.copyBuffer = ByteBuffer.allocateDirect(copyCapacityNeeded);
-            }
-            if (this.yuvTextures == null) {
-                this.yuvTextures = new int[3];
-                for (int i2 = 0; i2 < 3; i2++) {
-                    this.yuvTextures[i2] = GlUtil.generateTexture(3553);
-                }
-            }
-            for (int i3 = 0; i3 < 3; i3++) {
-                GLES20.glActiveTexture(33984 + i3);
-                GLES20.glBindTexture(3553, this.yuvTextures[i3]);
-                if (strides[i3] == planeWidths[i3]) {
-                    byteBuffer = planes[i3];
-                } else {
-                    YuvHelper.copyPlane(planes[i3], strides[i3], this.copyBuffer, planeWidths[i3], planeWidths[i3], planeHeights[i3]);
-                    byteBuffer = this.copyBuffer;
-                }
-                ByteBuffer packedByteBuffer = byteBuffer;
-                GLES20.glTexImage2D(3553, 0, 6409, planeWidths[i3], planeHeights[i3], 0, 6409, 5121, packedByteBuffer);
-            }
-            return this.yuvTextures;
-        }
+   public void drawFrame(VideoFrame frame, RendererCommon.GlDrawer drawer) {
+      this.drawFrame(frame, drawer, (Matrix)null);
+   }
 
-        @Nullable
-        public int[] uploadFromBuffer(VideoFrame.I420Buffer buffer) {
-            int[] strides = {buffer.getStrideY(), buffer.getStrideU(), buffer.getStrideV()};
-            ByteBuffer[] planes = {buffer.getDataY(), buffer.getDataU(), buffer.getDataV()};
-            return uploadYuvData(buffer.getWidth(), buffer.getHeight(), strides, planes);
-        }
+   public void drawFrame(VideoFrame frame, RendererCommon.GlDrawer drawer, Matrix additionalRenderMatrix) {
+      this.drawFrame(frame, drawer, additionalRenderMatrix, 0, 0, frame.getRotatedWidth(), frame.getRotatedHeight());
+   }
 
-        @Nullable
-        public int[] getYuvTextures() {
-            return this.yuvTextures;
-        }
+   public void drawFrame(VideoFrame frame, RendererCommon.GlDrawer drawer, @Nullable Matrix additionalRenderMatrix, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+      int width = frame.getRotatedWidth();
+      int height = frame.getRotatedHeight();
+      this.calculateTransformedRenderSize(width, height, additionalRenderMatrix);
+      if (this.renderWidth > 0 && this.renderHeight > 0) {
+         boolean isTextureFrame = frame.getBuffer() instanceof VideoFrame.TextureBuffer;
+         this.renderMatrix.reset();
+         this.renderMatrix.preTranslate(0.5F, 0.5F);
+         if (!isTextureFrame) {
+            this.renderMatrix.preScale(1.0F, -1.0F);
+         }
 
-        public void release() {
-            this.copyBuffer = null;
-            if (this.yuvTextures != null) {
-                GLES20.glDeleteTextures(3, this.yuvTextures, 0);
-                this.yuvTextures = null;
-            }
-        }
-    }
-
-    private static int distance(float x0, float y0, float x1, float y1) {
-        return (int) Math.round(Math.hypot(x1 - x0, y1 - y0));
-    }
-
-    private void calculateTransformedRenderSize(int frameWidth, int frameHeight, @Nullable Matrix renderMatrix) {
-        if (renderMatrix == null) {
-            this.renderWidth = frameWidth;
-            this.renderHeight = frameHeight;
-            return;
-        }
-        renderMatrix.mapPoints(this.dstPoints, srcPoints);
-        for (int i = 0; i < 3; i++) {
-            float[] fArr = this.dstPoints;
-            int i2 = (i * 2) + 0;
-            fArr[i2] = fArr[i2] * frameWidth;
-            float[] fArr2 = this.dstPoints;
-            int i3 = (i * 2) + 1;
-            fArr2[i3] = fArr2[i3] * frameHeight;
-        }
-        this.renderWidth = distance(this.dstPoints[0], this.dstPoints[1], this.dstPoints[2], this.dstPoints[3]);
-        this.renderHeight = distance(this.dstPoints[0], this.dstPoints[1], this.dstPoints[4], this.dstPoints[5]);
-    }
-
-    public void drawFrame(VideoFrame frame, RendererCommon.GlDrawer drawer) {
-        drawFrame(frame, drawer, null);
-    }
-
-    public void drawFrame(VideoFrame frame, RendererCommon.GlDrawer drawer, Matrix additionalRenderMatrix) {
-        drawFrame(frame, drawer, additionalRenderMatrix, 0, 0, frame.getRotatedWidth(), frame.getRotatedHeight());
-    }
-
-    public void drawFrame(VideoFrame frame, RendererCommon.GlDrawer drawer, @Nullable Matrix additionalRenderMatrix, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
-        int width = frame.getRotatedWidth();
-        int height = frame.getRotatedHeight();
-        calculateTransformedRenderSize(width, height, additionalRenderMatrix);
-        if (this.renderWidth <= 0 || this.renderHeight <= 0) {
-            Logging.w(TAG, "Illegal frame size: " + this.renderWidth + "x" + this.renderHeight);
-            return;
-        }
-        boolean isTextureFrame = frame.getBuffer() instanceof VideoFrame.TextureBuffer;
-        this.renderMatrix.reset();
-        this.renderMatrix.preTranslate(0.5f, 0.5f);
-        if (!isTextureFrame) {
-            this.renderMatrix.preScale(1.0f, -1.0f);
-        }
-        this.renderMatrix.preRotate(frame.getRotation());
-        this.renderMatrix.preTranslate(-0.5f, -0.5f);
-        if (additionalRenderMatrix != null) {
+         this.renderMatrix.preRotate((float)frame.getRotation());
+         this.renderMatrix.preTranslate(-0.5F, -0.5F);
+         if (additionalRenderMatrix != null) {
             this.renderMatrix.preConcat(additionalRenderMatrix);
-        }
-        if (isTextureFrame) {
+         }
+
+         if (isTextureFrame) {
             this.lastI420Frame = null;
-            drawTexture(drawer, (VideoFrame.TextureBuffer) frame.getBuffer(), this.renderMatrix, this.renderWidth, this.renderHeight, viewportX, viewportY, viewportWidth, viewportHeight);
-            return;
-        }
-        if (frame != this.lastI420Frame) {
-            this.lastI420Frame = frame;
-            VideoFrame.I420Buffer i420Buffer = frame.getBuffer().toI420();
-            this.yuvUploader.uploadFromBuffer(i420Buffer);
-            i420Buffer.release();
-        }
-        drawer.drawYuv(this.yuvUploader.getYuvTextures(), RendererCommon.convertMatrixFromAndroidGraphicsMatrix(this.renderMatrix), this.renderWidth, this.renderHeight, viewportX, viewportY, viewportWidth, viewportHeight);
-    }
+            drawTexture(drawer, (VideoFrame.TextureBuffer)frame.getBuffer(), this.renderMatrix, this.renderWidth, this.renderHeight, viewportX, viewportY, viewportWidth, viewportHeight);
+         } else {
+            if (frame != this.lastI420Frame) {
+               this.lastI420Frame = frame;
+               VideoFrame.I420Buffer i420Buffer = frame.getBuffer().toI420();
+               this.yuvUploader.uploadFromBuffer(i420Buffer);
+               i420Buffer.release();
+            }
 
-    public VideoFrame.Buffer prepareBufferForViewportSize(VideoFrame.Buffer buffer, int width, int height) {
-        buffer.retain();
-        return buffer;
-    }
+            drawer.drawYuv(this.yuvUploader.getYuvTextures(), RendererCommon.convertMatrixFromAndroidGraphicsMatrix(this.renderMatrix), this.renderWidth, this.renderHeight, viewportX, viewportY, viewportWidth, viewportHeight);
+         }
 
-    public void release() {
-        this.yuvUploader.release();
-        this.lastI420Frame = null;
-    }
+      } else {
+         Logging.w("VideoFrameDrawer", "Illegal frame size: " + this.renderWidth + "x" + this.renderHeight);
+      }
+   }
+
+   public VideoFrame.Buffer prepareBufferForViewportSize(VideoFrame.Buffer buffer, int width, int height) {
+      buffer.retain();
+      return buffer;
+   }
+
+   public void release() {
+      this.yuvUploader.release();
+      this.lastI420Frame = null;
+   }
+
+   private static class YuvUploader {
+      @Nullable
+      private ByteBuffer copyBuffer;
+      @Nullable
+      private int[] yuvTextures;
+
+      private YuvUploader() {
+      }
+
+      @Nullable
+      public int[] uploadYuvData(int width, int height, int[] strides, ByteBuffer[] planes) {
+         int[] planeWidths = new int[]{width, width / 2, width / 2};
+         int[] planeHeights = new int[]{height, height / 2, height / 2};
+         int copyCapacityNeeded = 0;
+
+         int i;
+         for(i = 0; i < 3; ++i) {
+            if (strides[i] > planeWidths[i]) {
+               copyCapacityNeeded = Math.max(copyCapacityNeeded, planeWidths[i] * planeHeights[i]);
+            }
+         }
+
+         if (copyCapacityNeeded > 0 && (this.copyBuffer == null || this.copyBuffer.capacity() < copyCapacityNeeded)) {
+            this.copyBuffer = ByteBuffer.allocateDirect(copyCapacityNeeded);
+         }
+
+         if (this.yuvTextures == null) {
+            this.yuvTextures = new int[3];
+
+            for(i = 0; i < 3; ++i) {
+               this.yuvTextures[i] = GlUtil.generateTexture(3553);
+            }
+         }
+
+         for(i = 0; i < 3; ++i) {
+            GLES20.glActiveTexture('蓀' + i);
+            GLES20.glBindTexture(3553, this.yuvTextures[i]);
+            ByteBuffer packedByteBuffer;
+            if (strides[i] == planeWidths[i]) {
+               packedByteBuffer = planes[i];
+            } else {
+               YuvHelper.copyPlane(planes[i], strides[i], this.copyBuffer, planeWidths[i], planeWidths[i], planeHeights[i]);
+               packedByteBuffer = this.copyBuffer;
+            }
+
+            GLES20.glTexImage2D(3553, 0, 6409, planeWidths[i], planeHeights[i], 0, 6409, 5121, packedByteBuffer);
+         }
+
+         return this.yuvTextures;
+      }
+
+      @Nullable
+      public int[] uploadFromBuffer(VideoFrame.I420Buffer buffer) {
+         int[] strides = new int[]{buffer.getStrideY(), buffer.getStrideU(), buffer.getStrideV()};
+         ByteBuffer[] planes = new ByteBuffer[]{buffer.getDataY(), buffer.getDataU(), buffer.getDataV()};
+         return this.uploadYuvData(buffer.getWidth(), buffer.getHeight(), strides, planes);
+      }
+
+      @Nullable
+      public int[] getYuvTextures() {
+         return this.yuvTextures;
+      }
+
+      public void release() {
+         this.copyBuffer = null;
+         if (this.yuvTextures != null) {
+            GLES20.glDeleteTextures(3, this.yuvTextures, 0);
+            this.yuvTextures = null;
+         }
+
+      }
+
+      // $FF: synthetic method
+      YuvUploader(Object x0) {
+         this();
+      }
+   }
 }

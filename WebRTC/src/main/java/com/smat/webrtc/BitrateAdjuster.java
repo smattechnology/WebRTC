@@ -1,11 +1,11 @@
 package com.smat.webrtc;
-/* loaded from: input.aar:classes.jar:org/webrtc/BitrateAdjuster.class */
+
 interface BitrateAdjuster {
-    void setTargets(int i, int i2);
+   void setTargets(int var1, int var2);
 
-    void reportEncodedFrame(int i);
+   void reportEncodedFrame(int var1);
 
-    int getAdjustedBitrateBps();
+   int getAdjustedBitrateBps();
 
-    int getCodecConfigFramerate();
+   int getCodecConfigFramerate();
 }
